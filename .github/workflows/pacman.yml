@@ -15,11 +15,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
+      - uses: actions/checkout@v5
+
       - name: generate contribution graph SVGs
         uses: abozanona/pacman-contribution-graph@v5.3.2
         with:
           github_user_name: ${{ github.repository_owner }}
           games: "pacman"
+
+      # 食べ終わったあとに GAME CLEAR / HIGH SCORE（=直近1年のcontribution数）を出す
+      - name: add game clear screen
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          score=$(gh api graphql -f query='query($u:String!){user(login:$u){contributionsCollection{contributionCalendar{totalContributions}}}}' \
+            -f u=${{ github.repository_owner }} --jq '.data.user.contributionsCollection.contributionCalendar.totalContributions')
+          python3 scripts/game_over.py "$score" dist/*.svg
 
       # 生成したSVGはoutputブランチへ（mainに毎日botのcommitが積もらない）
       - name: push SVGs to the output branch
