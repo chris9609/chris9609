@@ -19,6 +19,7 @@ jobs:
           # PATを登録していればprivateの言語・スター等も集計に入る。未登録ならGITHUB_TOKENで動く
           GITHUB_TOKEN: ${{ secrets.MY_PERSONAL_ACCESS_TOKEN || secrets.GITHUB_TOKEN }}
           USERNAME: ${{ github.repository_owner }}
+          SETTING_JSON: .github/profile-3d-settings.json
       - name: Commit & Push
         run: |
           git config user.name github-actions
